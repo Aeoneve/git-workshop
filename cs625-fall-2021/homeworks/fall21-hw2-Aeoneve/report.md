@@ -45,10 +45,11 @@ Analyzed the “kind of pet” column
         -   Spider, Spiney leaf insect to Insect
         -   Snake, Other: snake to Snake
         -   Lizard, Leopard Gecko to Lizard
--   Manually edited the following
+-   Manually edited the following which weren’t picked up in the
+    aforementioned steps
     -   God, dlg, Luna, Mona, Pit Bull, Sog, (blank) to Dog
-    -   Compared large number of “Other” animals to their breed to
-        obtain a “kind” of animal
+    -   Compared a number of “Other” animals to their breed to obtain a
+        “kind” of animal
 
 Analyzed the “pet’s age” column
 
@@ -63,9 +64,15 @@ Analyzed the “pet’s age” column
     -   Obtained all the values that specified weeks with the following
         GREL code and trasnformed them into numbers
         -   toNumber(value.replace(" months“,”")) / 52.14
-    -   Manually edited a large number of ages to convert them to
-        numbers
-        -   This included blanking fields where pets are deceased
+    -   Removed data where pets were deceased
+        -   -   if(or(or(value.contains(/.*(Deceased).*/),
+                value.contains(/.*(deceased).*/)),
+                or(value.contains(/.*(Dead).*/),
+                value.contains(/.*(dead).*/)), "", value)
+    -   Manually edited a number of ages to convert them to numbers
+        -   This included ages that weren’t picked up in the
+            aforementioned steps because they included odd text or other
+            values
     -   Split two entries up, one containing three dogs and another
         containing three dogs and one cat
         -   This was done by splitting the pets by name and then
@@ -144,11 +151,7 @@ Analyzed the “pet’s breed” column
 **There are 24 different types of pets not including the two “Other”
 pets of indeterminate species**
 
-Bird (12) Cat (500) Chicken (2) Chinchilla (4) Cow (1) Dog (1135)
-Elephant (1) Ferret (2) Fish (26) Frog (1) Gerbil (4) Guinea Pig (13)
-Hamster (16) Hedgehog (2) Hermit Crab (2) Horse (23) Insect (3) Lizard
-(8) Other (2) Prairie Dog (1) Rabbit (16) Rat (3) Snake (3) Tortoise (2)
-Turtle (3)
+![Data](Kind_of_pet.png)
 
 ## How many dogs?
 
@@ -157,6 +160,8 @@ Turtle (3)
 ## How many breeds of dogs?
 
 **There are a total of 118 dog breeds including “Mixed” and “(blank)”**
+
+![Data](Dog_breeds.png)
 
 ## What’s the most popular dog breed?
 
@@ -171,18 +176,26 @@ Retriever was the most popular breed with 185 dogs**
 
 **From 1 year to 5 years**
 
+![Data](Guinea_age.png)
+
 ## What is the oldest pet?
 
 **The oldest pet is Bruce Springsteen, a cat, at 24 years**
+
+![Data](Pet_age.png)
 
 ## Which are more popular, betta fish or goldfish? How many of each?
 
 **Betta fish are more popular with 14. There are a total of 9
 goldfish.**
 
+![Data](Fish_data.png)
+
 ## What’s the most popular everyday name for a cat?
 
 **The most popular everyday name for cats is “Kitty”**
+
+![Data](Cat_name.png)
 
 ## What’s the most popular full name for a dog?
 
@@ -191,6 +204,8 @@ goldfish.**
 names, “Sadie” wins out slightly as “Sadie Blue”, “Sadie Jo”, and “Sadie
 Mae” bringing the count to 10. There are only two other dogs with the
 name “Maggie” - “Maggie Peaches” and “Maggie Pie Thatcher”**
+
+![Data](Dog_name.png)
 
 ## References
 
