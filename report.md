@@ -1,253 +1,212 @@
-HW 1, CS 625, Fall 2021
+HW 2, CS 625, Fall 2021
 ================
-Dr. Michele Weigle
+Andrew Pale
 Sep 9, 2021
 
-## Git, GitHub
+# Part 1
+
+## Data Cleaning Steps
+
+Analyzed the “kind of pet” column
+
+-   Created a text facet
+-   Manually examined the data
+-   Excluded obvious joke data
+    -   Car
+    -   Card Board Poster
+    -   Katze
+    -   Robot
+    -   Roomba
+    -   Server
+    -   Virus
+    -   Blank
+-   Split multi-valued cells on the following
+    -   Dog, dog, dog, cat
+-   Cluster and edited the data
+    -   Used key collision and fingerprint to combine the following
+        -   Dog, dog, Dog., dog :))))) to Dog
+        -   Cat, cat, Cat!, Ca to Cat
+        -   Guinea pig, Guinea Pig to Guinea Pig
+        -   Bunny, bunny to Rabbit
+        -   Hamster, hamster to Hamster
+        -   Hermit Crab, Hermit crab to Hermit Crab
+    -   Used key collision and metaphone3 to combine the following
+        -   Dog, dig, Doggo to Dog
+        -   Beta fish, Betta fish to Fish
+    -   Used key collision and Daitch-Mokotoff to combine the following
+        -   Phoebe, Puppy to Dog
+    -   Used key collision and Beider-Morse to combine the following
+        -   Cat, Cats to Cat
+    -   Used nearest neighbor and levenshtein with radius 15 and block
+        chars 3 to combine the following
+        -   Chinchilla, Chinchilla (Other) to Chinchilla
+        -   Fish, Goldfish, Indoor goldfish to Fish
+        -   Kitten, Kitty Meow to Cat
+        -   Spider, Spiney leaf insect to Insect
+        -   Snake, Other: snake to Snake
+        -   Lizard, Leopard Gecko to Lizard
+-   Manually edited the following which weren’t picked up in the
+    aforementioned steps
+    -   God, dlg, Luna, Mona, Pit Bull, Sog, (blank) to Dog
+    -   Compared a number of “Other” animals to their breed to obtain a
+        “kind” of animal
+
+Analyzed the “pet’s age” column
+
+-   Created a numeric facet
+-   Isolated the Non-numeric data
+    -   Obtained all the values that specified years with the following
+        GREL code and trasnformed them into numbers
+        -   toNumber(value.replace(" years“,”"))
+    -   Obtained all the values that specified months with the following
+        GREL code and trasnformed them into numbers
+        -   toNumber(value.replace(" months“,”")) / 12.0
+    -   Obtained all the values that specified weeks with the following
+        GREL code and trasnformed them into numbers
+        -   toNumber(value.replace(" months“,”")) / 52.14
+    -   Removed data where pets were deceased
+        -   -   if(or(or(value.contains(/.*(Deceased).*/),
+                value.contains(/.*(deceased).*/)),
+                or(value.contains(/.*(Dead).*/),
+                value.contains(/.*(dead).*/)), "", value)
+    -   Manually edited a number of ages to convert them to numbers
+        -   This included ages that weren’t picked up in the
+            aforementioned steps because they included odd text or other
+            values
+    -   Split two entries up, one containing three dogs and another
+        containing three dogs and one cat
+        -   This was done by splitting the pets by name and then
+            duplicating the other information manually
+
+Analyzed the “pet’s breed” column
+
+-   Cluster and edited the data
+    -   Used key collision and fingerprint to combine the following
+        -   Variations of Golden Retriever, Domestic Shorthair, Domestic
+            Longhair, Lab Mix, Golden Doodle, Cavalier King Charles
+            Spaniel, West Highland White Terrier, Shih Tzu, Basset
+            Hound, Bernese Mountain Dog, Cocker Spaniel, Border Collie,
+            Whippet, Persian, Havanese, German Shepherd, Yellow Labrador
+            Retriever, English Springer Spaniel, Rhodesian Ridgeback,
+            Tuxedo Cat, Guinea Pig, Russian Dwarf Hamster, Siamese,
+            Cockapoo, Maine Coon, West Highland Terrier, Australian
+            Shepherd, Rottweiler, American Shorthair, Australian Cattle
+            Dog, Corgi, Chihuahua, Pitbull, Maltipoo, Pembroke Welsh
+            Corgi, Mini Schnauzer, Terrier, Beagle, Springer Spaniel,
+            Miniature Dachshund, Dachshund, Russian Blue, Chocolate
+            Labrador Retriever, English Cocker Spaniel, Jack Russell
+            Terrier, Black Labrador Retriever, Miniature Schnauzer,
+            British Shorthair, German Shepherd, Tortoise Shell, Toy
+            Poodle, Pug, YorkiePoo, Poodle, Border Collie, Siberian
+            Husky, King Charles and mixed were combined together
+    -   Used key collision and metaphone3 to combine the following
+        -   Variations of American Shorthair, Blue Tick Coon Hound,
+            Domestic Shorthair, Shih Tzu, Long-haired Chihuahua,
+            Goldendoodle, Tortoise Shell, Pitbull, Maine Coon, and mixed
+            were combined together
+    -   Used key collision and metaphone3 to combine the following
+        -   Variations of German Shepherd, Domestic Shorthair, Golden
+            Retriever, Yorkshire Terrier, Treeing Walker Coonhound,
+            Australian Shepherd, Black Labrador Retriever, Jack Russell
+            Terrier, Blue Tick Coon Hound, Blue Tick Coon Hound, Basset
+            Hound, Cairn Terrier, American Pitbull, Yorkiepoo, French
+            Bulldog, Miniature Schnauzer Bichon Frise, Chocolate
+            Labrador Retriever, Weimaraner, and Mixed were combined
+            together
+    -   Used key collision and cologne-phonetic to combine the following
+        -   Variations of Shih Tzu and Mixed were combined
+    -   Used key collision and Daitch-Mokotoff to combine the following
+        -   Variations of Border Collie, West Highland White Terrier,
+            Dachshund, Labradoodle, Chocolate Labrador Retriever,
+            Newfoundland, Foxhound, Catahoula, Mini Dachshund, Golden
+            Retriever, Great Pyrenees, Boston Terrier, Bichon Frise,
+            Cairn Terrier, Yorkshire Terrier, King Charles, Tortoise
+            Shell, Yellow Labrador Retriever, Russian Dwarf Hamster,
+            Winter White, and Mixed were combined together
+    -   Used nearest neighbor and levenshtein with radius 3 and block
+        chars 3 to combine the following
+        -   Shorthair Calico, Terrier, Pointer, Greyhound, Maltese,
+            American Shorthair, Chihuahua, Cairn Terrier, Poodle, Boston
+            Terrier, Dalmatian, Blue Heeler, Mixed were combined
+            together
+-   Transformed the data with a GREL expression to check for any breeds
+    that mention the words “Mix” or “mix” and change the entire entry to
+    “Mixed”. Additionally, a second expression was used to check for “/”
+    or “" and change the entry entry to”Mixed" if found
+    -   if(or(value.contains(/.*(Mix).*/), value.contains(/.*(mix).*/)),
+        “Mixed”, value)
+    -   if(or(value.contains(/.*(/).*/), value.contains(/.*(\\).*/)),
+        “Mixed”, value)
+-   Split an entry up containing two cats
+    -   This was done by splitting the pets by name and then duplicating
+        the other information manually
+-   Created a text facet
+-   Manually examined the data
+-   Combined breeds not caught by previous methods
 
-1.  *What is your GitHub username?*
+# Part 2
 
-    **Aeoneve**
+## How many types (kinds) of pets are there?
 
-2.  *What is the URL of your remote GitHub repo (created through
-    Mr. Kennedy’s exercises)?*
+**There are 24 different types of pets not including the two “Other”
+pets of indeterminate species**
 
-    **<https://github.com/Aeoneve/git-workshop>**
+![Data](Kind_of_pet.png)
 
-## R
+## How many dogs?
 
-The command below will load the tidyverse package. If you have installed
-R, RStudio, and the tidyverse package, it should display a list of
-loaded packages and their versions.
+**There are a total of 1135 dogs**
 
-    ## -- Attaching packages --------------------------------------- tidyverse 1.3.1 --
+## How many breeds of dogs?
 
-    ## v ggplot2 3.3.5     v purrr   0.3.4
-    ## v tibble  3.1.4     v dplyr   1.0.7
-    ## v tidyr   1.1.3     v stringr 1.4.0
-    ## v readr   2.0.1     v forcats 0.5.1
+**There are a total of 118 dog breeds including “Mixed” and “(blank)”**
 
-    ## -- Conflicts ------------------------------------------ tidyverse_conflicts() --
-    ## x dplyr::filter() masks stats::filter()
-    ## x dplyr::lag()    masks stats::lag()
+![Data](Dog_breeds.png)
 
-## R Markdown
+## What’s the most popular dog breed?
 
-1.  *Create a bulleted list with at least 3 items*
+**Not including “Mixed”, which accounted for 253 dogs, the Golden
+Retriever was the most popular breed with 185 dogs**
 
--   **Item 1**
--   **Item 2**
--   **Item 3**
+## What’s the age range of the dogs?
 
-2.  *Write a single paragraph that demonstrates the use of italics,
-    bold, bold italics, code, and includes a link. The paragraph does
-    not have to make sense.*
+**The youngest is months old and the oldest is 22 years**
 
-This is *italics*, this is **bold**, and this is ***bold italics***.
-This is some code:
+## What’s the age range of the guinea pigs?
 
-``` python
-code = "This is code in Python"
-print(code)
-```
+**From 1 year to 5 years**
 
-    ## This is code in Python
+![Data](Guinea_age.png)
 
-Lastly, click the word to find a download of [Python](http://python.org)
+## What is the oldest pet?
 
-3.  *Create a level 3 heading*
+**The oldest pet is Bruce Springsteen, a cat, at 24 years**
 
-### This is a 3rd level header
+![Data](Pet_age.png)
 
-## R
+## Which are more popular, betta fish or goldfish? How many of each?
 
-#### Data Visualization Exercises
+**Betta fish are more popular with 14. There are a total of 9
+goldfish.**
 
-install.packages(“tidyverse”) library(tidyverse)
+![Data](Fish_data.png)
 
-ggplot2::mpg
+## What’s the most popular everyday name for a cat?
 
-1.  (Q2) *How many rows are in mpg? How many columns?*
+**The most popular everyday name for cats is “Kitty”**
 
-    **The mpg dataframe contains 234 rows and 11 columns**
+![Data](Cat_name.png)
 
-2.  (Q4) *Make a scatterplot of hwy vs cyl.*
+## What’s the most popular full name for a dog?
 
-``` r
-ggplot(data = mpg) + geom_point(mapping = aes(x = cyl, y = hwy))
-```
+**The most popular full name for a dog is tied between the names
+“Maggie” and “Sadie”, both with a count of 7. However, if including last
+names, “Sadie” wins out slightly as “Sadie Blue”, “Sadie Jo”, and “Sadie
+Mae” bringing the count to 10. There are only two other dogs with the
+name “Maggie” - “Maggie Peaches” and “Maggie Pie Thatcher”**
 
-![](report_files/figure-gfm/unnamed-chunk-3-1.png)<!-- -->
-
-#### Workflow: basics Exercises
-
-1.  (Q2) *Tweak each of the following R commands so that they run
-    correctly (`library(tidyverse)` is correct):*
-
--   “data” misspelled
--   “filter” misspelled
--   “=” should be “==”
--   “diamonds” misspelled
-
-``` r
-library(tidyverse)
-ggplot(data = mpg) + 
-  geom_point(mapping = aes(x = displ, y = hwy))
-```
-
-![](report_files/figure-gfm/unnamed-chunk-4-1.png)<!-- -->
-
-``` r
-filter(mpg, cyl == 8)
-```
-
-    ## # A tibble: 70 x 11
-    ##    manufacturer model     displ  year   cyl trans  drv     cty   hwy fl    class
-    ##    <chr>        <chr>     <dbl> <int> <int> <chr>  <chr> <int> <int> <chr> <chr>
-    ##  1 audi         a6 quatt~   4.2  2008     8 auto(~ 4        16    23 p     mids~
-    ##  2 chevrolet    c1500 su~   5.3  2008     8 auto(~ r        14    20 r     suv  
-    ##  3 chevrolet    c1500 su~   5.3  2008     8 auto(~ r        11    15 e     suv  
-    ##  4 chevrolet    c1500 su~   5.3  2008     8 auto(~ r        14    20 r     suv  
-    ##  5 chevrolet    c1500 su~   5.7  1999     8 auto(~ r        13    17 r     suv  
-    ##  6 chevrolet    c1500 su~   6    2008     8 auto(~ r        12    17 r     suv  
-    ##  7 chevrolet    corvette    5.7  1999     8 manua~ r        16    26 p     2sea~
-    ##  8 chevrolet    corvette    5.7  1999     8 auto(~ r        15    23 p     2sea~
-    ##  9 chevrolet    corvette    6.2  2008     8 manua~ r        16    26 p     2sea~
-    ## 10 chevrolet    corvette    6.2  2008     8 auto(~ r        15    25 p     2sea~
-    ## # ... with 60 more rows
-
-``` r
-filter(diamonds, carat > 3)
-```
-
-    ## # A tibble: 32 x 10
-    ##    carat cut     color clarity depth table price     x     y     z
-    ##    <dbl> <ord>   <ord> <ord>   <dbl> <dbl> <int> <dbl> <dbl> <dbl>
-    ##  1  3.01 Premium I     I1       62.7    58  8040  9.1   8.97  5.67
-    ##  2  3.11 Fair    J     I1       65.9    57  9823  9.15  9.02  5.98
-    ##  3  3.01 Premium F     I1       62.2    56  9925  9.24  9.13  5.73
-    ##  4  3.05 Premium E     I1       60.9    58 10453  9.26  9.25  5.66
-    ##  5  3.02 Fair    I     I1       65.2    56 10577  9.11  9.02  5.91
-    ##  6  3.01 Fair    H     I1       56.1    62 10761  9.54  9.38  5.31
-    ##  7  3.65 Fair    H     I1       67.1    53 11668  9.53  9.48  6.38
-    ##  8  3.24 Premium H     I1       62.1    58 12300  9.44  9.4   5.85
-    ##  9  3.22 Ideal   I     I1       62.6    55 12545  9.49  9.42  5.92
-    ## 10  3.5  Ideal   H     I1       62.8    57 12587  9.65  9.59  6.03
-    ## # ... with 22 more rows
-
-## Google Colab
-
-1.  *What are the URLs of your Google Colab notebooks (both Python and
-    R)?*
-
-[Python
-Notebook](https://colab.research.google.com/drive/1Jqs3Dy9EzuTKX3OZEJ13c0Wz33_dWOYo?usp=sharing)
-
-[R
-Notebook](https://colab.research.google.com/drive/1fQt_NIZUjKP7UXYX63w7GklpjFzQbAil?usp=sharing)
-
-## Tableau
-
-*Insert your the image of your final bar chart here*
-
-![Chart](Sales.png)
-
-1.  *What conclusions can you draw from the chart?*
-
-**Sales are increasing each year but Technology is especially strong**
-
-## Observable and Vega-Lite
-
-### A Taste of Observable
-
-1.  *In the “New York City weather forecast” section, try replacing
-    `Forecast: detailedForecast` with `Forecast: shortForecast`. Then
-    press the blue play button or use Shift-Return to run your change.
-    What happens?*
-
-**The table above changes, under the “Forcast” column most of the text**
-**goes away leaving only a brief explaination of the forecast**
-
-1.  *Under the scatterplot of temperature vs. name, try replacing
-    `markCircle()` with `markSquare()`. Then press the blue play button
-    or use Shift-Return to run your change. What happens? How about
-    `markPoint()`?*
-
-**markSquare() changes the icons to solid squares and markPoint
-changes** **the icons to hollow circles**
-
-1.  *Under “Pick a location, see the weather forecast”, pick a location
-    on the map. Where was the point you picked near?*
-
-**I attempted to click near Philadelphia and got the coordinates**
-**\[-75.87, 40.19\], which ended up being New Morgan, PA**
-
-1.  *The last visualization on this page is a “fancy” weather chart
-    embedded from another notebook. Click on the 3 dots next to that
-    chart and choose ‘Download PNG’. Insert the PNG into your report.*
-
-![Fancy Weather](weather.png)
-
-### Charting with Vega-Lite
-
-`markCircle()`
-
-1.  *Pass an option of `{ size: 200 }` to `markCircle()`.*
-
-**The circles become so large they are mostly indistinguishable**
-
-1.  *Try `markSquare` instead of `markCircle`.*
-
-**The large solid circles become large solid squares**
-
-1.  *Try `markPoint({ shape: 'diamond' })`.*
-
-**The chart becomes much nicer looking with small hollow diamonds**
-
-`vl.x().fieldQ("Horsepower")`, …
-
-1.  *Change `Horsepower` to `Acceleration`*
-
-**The data moves to the upper right side of the chart from the** **upper
-middle as the x-axis changes from Horsepower to Acceleration**
-
-1.  *Swap what fields are displayed on the x- and y-axis*
-
-**The data congregates around the middle of the chart now as the**
-**axes flip and Acceleration is the y and Miles\_per\_Gallon is the x**
-
-`vl.tooltip().fieldN("Name")`
-
-1.  *Change `Name` to `Origin`.*
-
-**Each data point now shows the country of origin instead of the**
-**name of the car when you hover over it**
-
-Another example, `count()`
-
-1.  *Remove the `vl.y().fieldN("Origin")` line.*
-
-**All the data gets combined into one count and the y axis is removed**
-
-1.  *Replace `count()` with `average("Miles_per_Gallon")`.*
-
-**The average of all the combined data is computed and displayed** **on
-the x-axis as a bar chart**
+![Data](Dog_name.png)
 
 ## References
 
-*Every report must list the references that you consulted while
-completing the assignment. If you consulted a webpage, you must include
-the URL.*
-
--   <https://classroom.github.com/>
--   <https://github.com/>
--   <https://git.cs.odu.edu/tkennedy/git-workshop/-/wikis/Git-Workshop>
--   <https://www.rstudio.com/>
--   <https://github.com/odu-cs625-datavis/github-classroom-for-students/blob/master/README.md>
--   <https://r4ds.had.co.nz/>
--   <https://github.com/adam-p/markdown-here/wiki/Markdown-Cheatsheet>
--   <https://colab.research.google.com/>
--   <https://www.tableau.com/learn/tutorials/on-demand/getting-started>
--   <https://www.earthdatascience.org/courses/earth-analytics/document-your-science/add-images-to-rmarkdown-report/>
--   <https://observablehq.com/>
+-   <https://github.com/jgolbeck/petnames>
